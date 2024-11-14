@@ -121,14 +121,20 @@ body > .-spring {
   justify-content: flex-start;
   top: 50%;
   left: 50%;
+  width: 25rem;
+  max-width: 100vw;
+  max-height: 100vh;
   background-color: #ffffff;
+  box-sizing: border-box;
   color: #212121;
   opacity: 0;
+  overflow: auto;
   padding: 2.5rem;
   pointer-events: none;
   position: fixed;
   transform: scale(95%) translate(-50%, -50%);
-  transition-duration: 250ms;
+  transform-origin: top left;
+  transition-duration: 375ms;
   transition-property: opacity, transform;
   transition-timing-function: ease;
   z-index: 8;
@@ -141,6 +147,13 @@ body > .-spring {
   opacity: 1;
   pointer-events: all;
   transform: scale(100%) translate(-50%, -50%);
+}
+#registerForm > .title {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+#registerForm > button:first-of-type {
+  margin-top: 0.75rem;
 }
 
 /*# sourceMappingURL=index.unsigned.css.map */

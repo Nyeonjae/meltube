@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nyeonjae.meltube.maapers.UserMapper">
+    <insert id="insertUser"
+    parameterType="com.nyeonjae.meltube.endtities.UserEntity">
+    INSERT INTO `meltube`.`users` (email, password, nickname, contact, created_at, updated_at, deleted_at, iS_admin, iS_suspended, iS_verified)
+    VALUES (#{email},#{password},#{nickname},#{contact},#{createdAt},#{updatedAt},#{deletedAt},#{isAdmin},#{isSuspended},#{isVerified})
+    </insert>
+    <select id="selectUserByEmail"
+    resultType="com.nyeonjae.meltube.endtities.UserEntity">
+        SELECT email        AS `email`,
+               password     AS ` password`,
+               nickname     AS ` nickname`,
+               contact      AS ` contact`,
+               created_at   AS ` createdAt`,
+               updated_at   AS ` updatedAt`,
+               deleted_at   AS ` deletedAt`,
+               iS_admin     AS ` isAdmin`,
+               iS_suspended AS `isSuspended`,
+               iS_verified  AS `isVerified`
+        FROM `meltube`.`users`
+        WHERE `email` = #{email}
+        LIMIT 1
+    </select>
+    <select id="selectUserByContact" resultType="com.nyeonjae.meltube.endtities.UserEntity">
+        SELECT email        AS `email`,
+               password     AS ` password`,
+               nickname     AS ` nickname`,
+               contact      AS ` contact`,
+               created_at   AS ` createdAt`,
+               updated_at   AS ` updatedAt`,
+               deleted_at   AS ` deletedAt`,
+               iS_admin     AS ` isAdmin`,
+               iS_suspended AS `isSuspended`,
+               iS_verified  AS `isVerified`
+        FROM `meltube`.`users`
+        WHERE `contact` = #{contact}
+        LIMIT 1
+    </select>
+
+    <select id="selectUserByNickname" resultType="com.nyeonjae.meltube.endtities.UserEntity">
+        SELECT email        AS `email`,
+               password     AS ` password`,
+               nickname     AS ` nickname`,
+               contact      AS ` contact`,
+               created_at   AS ` createdAt`,
+               updated_at   AS ` updatedAt`,
+               deleted_at   AS ` deletedAt`,
+               iS_admin     AS ` isAdmin`,
+               iS_suspended AS `isSuspended`,
+               iS_verified  AS `isVerified`
+        FROM `meltube`.`users`
+        WHERE `nickname` = #{nickname}
+        LIMIT 1
+    </select>
+
+
+</mapper>

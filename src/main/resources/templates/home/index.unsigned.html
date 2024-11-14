@@ -13,9 +13,7 @@
     <title>Meltube</title>
 </head>
 <body>
-<div class="cover" id="cover">
-
-</div>
+<div class="cover" id="cover"></div>
 <main id="main" class="-spring">
     <div class="content">
         <img alt="Meltube" class="logo" th:src="@{'assets/images/logo/_logo.png'}">
@@ -50,31 +48,40 @@
 </main>
 <form novalidate class="register-form" id="registerForm">
     <h2 class="title">회원가입</h2>
-    <label class="--obj-label">
+    <label class="--obj-label" data-id="email">
         <span class="_text">이메일</span>
         <input autofocus autocomplete="email" class="_field --obj-filed -light"
                maxlength="50" minlength="8" name="email" spellcheck="false"
                type="email">
+        <span class="_warning">올바른 이메일을 입력해 주세요.</span>
     </label>
-    <label class="--obj-label">비밀번호
+
+    <label class="--obj-label" data-id="password">
+        <span class="_text">비밀번호</span>
         <input autocomplete="password" class="_field --obj-filed -light"
-               maxlength="50" minlength="8" name="password" spellcheck="false"
+               maxlength="50" minlength="6" name="password" spellcheck="false"
                type="password">
         <input autocomplete="password" class="_field --obj-filed -light"
-               maxlength="50" minlength="8" name="password" placeholder="비밀번호 재입력" spellcheck="false"
+               maxlength="50" minlength="6" name="passwordCheck" placeholder="비밀번호 재입력" spellcheck="false"
                type="password">
+        <span class="_warning">올바른 비밀번호를 입력해 주세요.</span>
     </label>
-    <label class="--obj-label">
+
+    <label class="--obj-label" data-id="nickname">
         <span class="_text">닉네임</span>
         <input autocomplete="off" class="_field --obj-filed -light" maxlength="10" minlength="2"
                name="nickname" spellcheck="false" type="text">
+        <span class="_warning">올바른 닉네임을 입력해 주세요.</span>
     </label>
-    <label class="--obj-label">
+
+    <label class="--obj-label" data-id="contact">
         <span class="_text">연락처</span>
         <input autocomplete="off" class="_field --obj-filed -light" maxlength="12" minlength="10"
-               name="concat" placeholder="'-' 없이 입력" spellcheck="false" type="tel">
+               name="contact" placeholder="'-' 없이 입력" spellcheck="false" type="tel">
+        <span class="_warning">올바른 연락처를 입력해 주세요.</span>
     </label>
-    <label class="--obj-check-label">
+
+    <label class="--obj-check-label -light">
         <input class="_input" name="agree" type="checkbox">
         <span class="_box"></span>
         <span class="_text">
@@ -82,8 +89,8 @@
             <a href="#">개인정보 처리방침</a>을 읽어보았으며 이해하였고 동의합니다.
         </span>
     </label>
-    <button class="--obj-button -color-primary">회원가입</button>
-    <button class="--obj-button -color-gray">취소</button>
+    <button class="--obj-button -color-primary" type="submit">회원가입</button>
+    <button class="--obj-button -color-light-gray" name="cancel" type="button">취소</button>
 </form>
 
 </body>

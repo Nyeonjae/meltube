@@ -2,12 +2,160 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 @import "./_global";
 
+.---loading {
+  @include flex(column, center, center, 1rem);
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(2.5rem);
+  background-color: #212121c0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  user-select: none;
+  z-index: 100;
+
+  &.-visible {
+    opacity: 1;
+    pointer-events: all;
+
+    > ._icon {
+      top: 0;
+      opacity: 1;
+      transition-delay: 250ms;
+
+    }
+
+    > ._text {
+      top: 0;
+      opacity: 1;
+      transition-delay: 750ms;
+    }
+  }
+
+  > ._icon {
+    @keyframes anim {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  top: 0.5rem;
+    width: 3rem;
+    animation-name: anim;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    opacity: 0;
+    position: relative;
+    transition-duration: 250ms;
+    transition-property: top, opacity;
+    transition-timing-function: ease;
+  }
+
+  > ._text {
+    top: 0.5rem;
+    font-size: 1.25rem;
+    opacity: 0;
+    position: relative;
+    transition-duration: 250ms;
+    transition-property: top,opacity;
+    transition-timing-function: ease;
+  }
+}
+
 a:link, a:visited {
   color: inherit;
   text-decoration: none;
 
   &:hover {
     text-decoration: underline;
+  }
+}
+.---dialog-cover {
+  top:0;
+  left:0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(2.5rem);
+  background-color: #212121c0;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transition-duration: 250ms;
+  transition-property: opacity;
+  transition-timing-function: ease;
+  z-index: 98;
+
+  &.-visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+.---dialog {
+  @include flex(column, stretch, flex-start);
+  top: calc(50% + 0.5rem);
+  left: 50%;
+  min-width: 15rem;
+  opacity: 0;
+  pointer-events: none;
+  position: fixed;
+  transform: translate(-50%, -50%);
+  transition-duration: 125ms;
+  transition-property: top, opacity;
+  transition-timing-function: ease;
+  z-index: 99;
+
+  &.-visible {
+    top:50%;
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  > ._title {
+    background-color: #212121;
+    color: #ffffff;
+    padding: 0.425rem 0.875rem;
+  }
+
+  > ._content {
+    background-color: #ffffff;
+    color: #212121;
+    text-align: justify;
+    padding: 0.75rem 0.875rem;
+  }
+  > ._button-container {
+    background-color: #ffffff;
+    border-top: 0.0625rem solid #eeeeee;
+    color: #212121;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+
+    >._button {
+      $background_color: #ffffff;
+      background-color: $background_color;
+      cursor: pointer;
+      font-size: 0.75rem;
+      padding: 0.375rem;
+
+      + ._button {
+        border-left: 0.0625rem solid #f0f0f0;
+      }
+
+      &:hover {
+        background-color: darken($background_color, 5%);
+      }
+
+      &:active {
+        background-color: darken($background_color, 10%);
+      }
+    }
   }
 }
 
@@ -52,11 +200,34 @@ ol, ul {
   $text_color: #9e9e9e;
   @include flex(column, stretch, flex-start, 0.25rem);
 
+  &.-invalid {
+    $color: #e74c3c;
 
+
+    > ._text {
+      color: $color;
+    }
+
+    > ._field:not(:disabled) {
+      border-color: $color !important;
+    }
+
+
+    > ._warning {
+      color: $color;
+      display: block;
+    }
+  }
 
   > ._text {
+    font-size: 0.7rem;
+  }
+
+  > ._warning {
+    display: none;
     font-size: 0.8rem;
   }
+
 }
 
 .--obj-filed {
@@ -102,6 +273,56 @@ ol, ul {
       background-color: darken($background_color, 10%);
     }
   }
+
+  &.-color-light-gray {
+    $background_color: #a0a0a0;
+    background-color: $background_color;
+    color: #ffffff;
+
+    &:hover {
+      background-color: darken($background_color, 5%);
+    }
+
+    &:active {
+      background-color: darken($background_color, 10%);
+    }
+  }
 }
 
+.--obj-check-label {
+  @include flex(row, center, flex-start, 0.25rem);
+  cursor: pointer;
+  user-select: none;
 
+  > ._input {
+    display: none;
+
+    &.-light {
+      > ._box {
+        background-color: #ffffff;
+      }
+    }
+
+    > ._input {
+      display: none;
+    }
+  }
+
+  > ._input:checked + ._box {
+    background-color: #01d345;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAACXUlEQVR4nO3aO4hVRxgH8M8HhmXRCGYVIcqCID4gIqLYuNukSQpjpSJbKgQEC0GQICQWbmEhCrJY+8BKQaJpwqaRiIUPUCxEEJFoBBPBZxKj+clxryiL987d3SL3zM6vvjPM/zucc2a+cyOKoiiKoiiKopawEl+iJyYTfIZfvfcPfojJANNwwccNRO6wU3O/RM6wCM9bFOBy5ApT8LPWDkSusDUR/hl6I0eYj0eJAuyIXOF0IvzF6u0QOcKmRPi/sTxyhDl4kCjAnsgVjibCX8OMyBG+SoR/hdWRI3TjdqIA+yNXOJwIXxWnO3KEtXjdIvx/1RE4coRPcCNx9Y9ErrAvEf4+ZkeO8AVeJgqwIXKE6biUCH8ycoXdifB/YF7kCIvxIlGAgZybHMOJ8D9Fp8AKnMXvuIJtE5zv20T4J1gYnQBL8fQjizw4zvk+x+NEAbZHp8CJFgvdNY75fkyEP4+p0SlwvcViq63r5jHMtSUR/i8siU5i5N5PdWb62/yq8zAx13fRadDXOIi0UjUul03gVqpcrTZG0YnwvbTfqgdck/FfJ8b+i1XRyTDURhGqVtWno8bNwt3EuMGoycfJM20UYfjDfl11jE38/ia6og4ws7ERSjne2O31J54f1VukL2r4teZOG0UYbFzdVoaijozsDv80Mfdq3eTAusbGZbzWR91hY6KR2cyxyAV2jTF8tRucGznBoTEUoO2zQ21gKk61Ef5c5Apdo/7CNlrVA1gQOUMPbjUpwIS6SLWB3sbJ7p2q5783JhMjz4Q1+KbaOf7f6ymKoiiKoiiKeOsNHrAqLXYQ6kQAAAAASUVORK5CYII=");
+  }
+
+  > ._box {
+    @include minmaxSize(1rem);
+    border: 0.125rem solid #01d345;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 87.5%;
+  }
+
+  > ._text {
+    text-align: justify;
+  }
+
+}
