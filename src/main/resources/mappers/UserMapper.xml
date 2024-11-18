@@ -2,14 +2,31 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.nyeonjae.meltube.maapers.UserMapper">
+<mapper namespace="com.nyeonjae.meltube.mappers.UserMapper">
     <insert id="insertUser"
-    parameterType="com.nyeonjae.meltube.endtities.UserEntity">
+    parameterType="com.nyeonjae.meltube.entities.UserEntity">
     INSERT INTO `meltube`.`users` (email, password, nickname, contact, created_at, updated_at, deleted_at, iS_admin, iS_suspended, iS_verified)
     VALUES (#{email},#{password},#{nickname},#{contact},#{createdAt},#{updatedAt},#{deletedAt},#{isAdmin},#{isSuspended},#{isVerified})
     </insert>
+
+    <update id="updateUser"
+    parameterType="com.nyeonjae.meltube.entities.UserEntity">
+    UPDATE `meltube`.`users`
+    SET `password` = #{password},
+        `nickname` = #{nickname},
+        `contact` = #{contact},
+        `updated_at`= #{updatedAt},
+        `deleted_at` = #{deletedAt},
+        `iS_admin` = #{isAdmin},
+        `iS_suspended` = #{isSuspended},
+        `iS_verified` = #{isVerified}
+    WHERE `email` = #{email}
+    LIMIT 1
+    </update>
+
+
     <select id="selectUserByEmail"
-    resultType="com.nyeonjae.meltube.endtities.UserEntity">
+    resultType="com.nyeonjae.meltube.entities.UserEntity">
         SELECT email        AS `email`,
                password     AS ` password`,
                nickname     AS ` nickname`,
@@ -24,7 +41,7 @@
         WHERE `email` = #{email}
         LIMIT 1
     </select>
-    <select id="selectUserByContact" resultType="com.nyeonjae.meltube.endtities.UserEntity">
+    <select id="selectUserByContact" resultType="com.nyeonjae.meltube.entities.UserEntity">
         SELECT email        AS `email`,
                password     AS ` password`,
                nickname     AS ` nickname`,
@@ -40,7 +57,7 @@
         LIMIT 1
     </select>
 
-    <select id="selectUserByNickname" resultType="com.nyeonjae.meltube.endtities.UserEntity">
+    <select id="selectUserByNickname" resultType="com.nyeonjae.meltube.entities.UserEntity">
         SELECT email        AS `email`,
                password     AS ` password`,
                nickname     AS ` nickname`,

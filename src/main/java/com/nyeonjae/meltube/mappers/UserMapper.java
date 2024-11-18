@@ -1,6 +1,6 @@
-package com.nyeonjae.meltube.maapers;
+package com.nyeonjae.meltube.mappers;
 
-import com.nyeonjae.meltube.endtities.UserEntity;
+import com.nyeonjae.meltube.entities.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,4 +15,6 @@ public interface UserMapper {
 
 
     UserEntity selectUserByNickname(@Param("nickname") String nickname);
+
+    int updateUser(UserEntity user);
 }

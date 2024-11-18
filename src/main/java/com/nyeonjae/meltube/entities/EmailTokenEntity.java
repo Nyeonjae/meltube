@@ -1,4 +1,4 @@
-package com.nyeonjae.meltube.endtities;
+package com.nyeonjae.meltube.entities;
 
 
 import lombok.EqualsAndHashCode;

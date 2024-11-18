@@ -1,15 +1,19 @@
 package com.nyeonjae.meltube.controller;
 
 
-import com.nyeonjae.meltube.endtities.UserEntity;
+import com.nyeonjae.meltube.entities.EmailTokenEntity;
+import com.nyeonjae.meltube.entities.UserEntity;
 import com.nyeonjae.meltube.results.Result;
 import com.nyeonjae.meltube.services.UserService;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequestMapping(value = "/user")
@@ -23,11 +27,20 @@ public class UserController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String postIndex(UserEntity user) {
-        Result result = this.userService.register(user);
+    public String postIndex(HttpServletRequest request, UserEntity user) throws MessagingException {
+        Result result = this.userService.register(request, user);
         JSONObject response = new JSONObject();
         response.put(Result.NAME, result.nameToLower());
         return response.toString();
+    }
+
+    @RequestMapping(value="/validate-email-token", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+    public ModelAndView getValidateEmailToken(EmailTokenEntity emailToken) {
+        Result result = this.userService.validateEmailToken(emailToken);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(Result.NAME, result.nameToLower());
+        modelAndView.setViewName("user/validateEmailToken");
+        return modelAndView;
     }
 }
 
