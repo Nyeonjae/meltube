@@ -80,7 +80,7 @@ class Dialog {
         $title.innerText = args.title;
         const $content = document.createElement('div');
         $content.classList.add('_content');
-        $content.innerText = args.content;
+        $content.innerHTML = args.content;
         $dialog.append($title, $content);
         if (args.buttons != null && args.buttons.length > 0) {
             const $buttonContainer = document.createElement('div');
