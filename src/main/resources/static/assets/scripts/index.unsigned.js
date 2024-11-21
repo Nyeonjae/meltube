@@ -97,6 +97,24 @@ const $recoverForm = document.getElementById('recoverForm');
         $cover.hide();
         $registerForm.hide();
     };
+
+    $menu.querySelector(':scope > .item > [rel="recover"]').onclick = (e) => {
+        e.preventDefault();
+        $cover.onclick = () => { // 커버 ( 바깥쪽 ) 누르면 빠져나와야 하니까
+            $cover.hide();
+            $recoverForm.hide();
+        };
+        $cover.show();
+        $recoverForm.reset(); // 필드 초기화 // > 창을 내렸다가 다시 켰을때 초기화 해주는 역할
+        $recoverForm.show();
+    };
+
+    $registerForm['cancel'].onclick = () => {
+        $cover.hide();
+        $registerForm.hide();
+
+    };
+
 }
 
 

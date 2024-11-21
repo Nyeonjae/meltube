@@ -44,7 +44,7 @@
         transform: rotate(360deg);
       }
     }
-  top: 0.5rem;
+    top: 0.5rem;
     width: 3rem;
     animation-name: anim;
     animation-duration: 1s;
@@ -63,7 +63,7 @@
     opacity: 0;
     position: relative;
     transition-duration: 250ms;
-    transition-property: top,opacity;
+    transition-property: top, opacity;
     transition-timing-function: ease;
   }
 }
@@ -76,9 +76,10 @@ a:link, a:visited {
     text-decoration: underline;
   }
 }
+
 .---dialog-cover {
-  top:0;
-  left:0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   backdrop-filter: blur(2.5rem);
@@ -112,7 +113,7 @@ a:link, a:visited {
   z-index: 99;
 
   &.-visible {
-    top:50%;
+    top: 50%;
     opacity: 1;
     pointer-events: all;
   }
@@ -129,6 +130,7 @@ a:link, a:visited {
     text-align: justify;
     padding: 0.75rem 0.875rem;
   }
+
   > ._button-container {
     background-color: #ffffff;
     border-top: 0.0625rem solid #eeeeee;
@@ -137,7 +139,7 @@ a:link, a:visited {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr;
 
-    >._button {
+    > ._button {
       $background_color: #ffffff;
       background-color: $background_color;
       cursor: pointer;
@@ -235,6 +237,21 @@ ol, ul {
   transition-duration: 250ms;
   transition-property: border-color;
   transition-timing-function: ease;
+
+  &.-dark {
+    $border_color: #424242;
+    background-color: #222324;
+    border: 0.0625rem solid $border_color;
+    color: #ffffff;
+
+    &:hover {
+      border-color: lighten($border_color, 10%);
+    }
+
+    &:focus {
+      border-color: #01d345
+    }
+  }
 
   &.-light {
     $border_color: #eeeeee;
