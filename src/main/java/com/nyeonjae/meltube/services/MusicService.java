@@ -99,9 +99,9 @@ public class MusicService {
         $name.select(".none").remove();
         Elements $artist = document.select(".artist_name > span:first-child");
         Elements $list = document.select("dl.list");
-        Elements $album = document.select("dd:nth-child(2)");
+        Elements $album = $list.select("dd:nth-child(2)");
         Elements $release = $list.select("dd:nth-child(4)");
-        Elements $genre = document.select("dd:nth-child(6)");
+        Elements $genre = $list.select("dd:nth-child(6)");
         Elements $lyrics = document.select(".lyric");
         Elements $cover = document.select("img[src^=\"https://cdnimg.melon.co.kr/cm2/album/images/\"]");
 
