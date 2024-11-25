@@ -12,6 +12,11 @@ import java.time.LocalDateTime;
 @Setter
 @EqualsAndHashCode(of = {"index"})
 public class MusicEntity {
+    public enum Status {
+        ALLOWED,
+        DENIED,
+        PENDING,
+    }
 
     private int index;
     private String userEmail;
@@ -25,6 +30,7 @@ public class MusicEntity {
     private String coverContentType;
     private String coverFileName;
     private String youtubeId;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean isDeleted;

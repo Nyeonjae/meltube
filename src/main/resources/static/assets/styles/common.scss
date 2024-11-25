@@ -276,6 +276,7 @@ ol, ul {
   transition-property: background-color;
   transition-timing-function: ease;
   user-select: none;
+  white-space: nowrap;
 
   &.-color-primary {
     $background_color: #01cd3d;
