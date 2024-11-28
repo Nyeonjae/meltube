@@ -2,10 +2,12 @@ package com.nyeonjae.meltube.services;
 
 import com.nyeonjae.meltube.entities.MusicEntity;
 import com.nyeonjae.meltube.entities.UserEntity;
+import com.nyeonjae.meltube.exceptions.TransactionalException;
 import com.nyeonjae.meltube.mappers.MusicMapper;
 import com.nyeonjae.meltube.results.CommonResult;
 import com.nyeonjae.meltube.results.Result;
 import com.nyeonjae.meltube.results.music.AddMusicResult;
+import com.nyeonjae.meltube.vos.ResultVo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.HttpStatusException;
@@ -15,6 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,16 +40,16 @@ public class MusicService {
         this.musicMapper = musicMapper;
     }
 
-    public Result addMusic(UserEntity user, MusicEntity music , MultipartFile cover) throws IOException, InterruptedException {
+    public Result addMusic(UserEntity user, MusicEntity music, MultipartFile cover) throws IOException, InterruptedException {
         if (user == null || user.isSuspended() || user.getDeletedAt() != null) {
             return CommonResult.FAILURE_UNSIGNED;
         }
         if (music == null ||
-            music.getArtist() == null || music.getArtist().isEmpty() || music.getArtist().length() > 50 ||
-            music.getAlbum() == null || music.getAlbum().isEmpty() || music.getAlbum().length() > 50 ||
-            music.getReleaseDate() == null ||
-            music.getName() == null || music.getName().isEmpty() || music.getName().length() > 50 ||
-            music.getYoutubeId() == null || music.getYoutubeId().length() != 11 ||
+                music.getArtist() == null || music.getArtist().isEmpty() || music.getArtist().length() > 50 ||
+                music.getAlbum() == null || music.getAlbum().isEmpty() || music.getAlbum().length() > 50 ||
+                music.getReleaseDate() == null ||
+                music.getName() == null || music.getName().isEmpty() || music.getName().length() > 50 ||
+                music.getYoutubeId() == null || music.getYoutubeId().length() != 11 ||
                 (music.getCoverFileName() == null && cover == null)) {
             // music 의 coverFileName 도 null 이고 cover 도 null 이면 커버 이미지를 아예 안줬다는 말이니까
             return CommonResult.FAILURE;
@@ -62,15 +65,14 @@ public class MusicService {
                     .uri(URI.create(music.getCoverFileName()))
                     .GET()
                     .build();
-         HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-         if (response.statusCode() != 200) {
-             return CommonResult.FAILURE;
-         }
-         music.setCoverData(response.body());
-         music.setCoverContentType("image/jpeg");
-         music.setCoverFileName("_cover.jpg");
-        }
-        else {
+            HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            if (response.statusCode() != 200) {
+                return CommonResult.FAILURE;
+            }
+            music.setCoverData(response.body());
+            music.setCoverContentType("image/jpeg");
+            music.setCoverFileName("_cover.jpg");
+        } else {
             // 직접 커버 이미지를 첨부 했으면 발생하는 로직
             music.setCoverData(cover.getBytes());
             music.setCoverContentType(cover.getContentType());
@@ -146,8 +148,7 @@ public class MusicService {
                     youtubeId = hrefArray[1];
                 }
             }
-        }
-        catch (HttpStatusException ignored) {
+        } catch (HttpStatusException ignored) {
             youtubeId = null;
 
         }
@@ -155,6 +156,59 @@ public class MusicService {
 
         return music;
     }
+
+
+    public MusicEntity[] getAllMusic(boolean includeCover) {
+        return this.musicMapper.selectMusics(includeCover);
+    }
+
+    @Transactional
+    public Result withdrawInquiries(UserEntity user, int[] indexes) {
+        if (user == null || user.isSuspended() || user.getDeletedAt() != null) {
+            return CommonResult.FAILURE_UNSIGNED;
+        }
+        if (indexes == null || indexes.length == 0) {
+            return CommonResult.FAILURE;
+        }
+
+        for (int index : indexes) {
+            MusicEntity music = this.musicMapper.selectMusicByIndex(index, false);
+            if (music == null || music.isDeleted()) {
+                throw new TransactionalException();
+            }
+            if (!music.getUserEmail().equals(user.getEmail())) {
+                throw new TransactionalException();
+            }
+            if (!music.getStatus().equals(MusicEntity.Status.PENDING.name())) {
+                throw new TransactionalException();
+            }
+            music.setDeleted(true);
+            if (this.musicMapper.updateMusic(music, false) == 0 ) {
+                throw new TransactionalException();
+            }
+        }
+        return CommonResult.SUCCESS;
+    }
+
+
+    public MusicEntity getMusicByIndex(Integer index, boolean includeCover) {
+        if (index == null || index < 1) {
+            return null;
+        }
+        return this.musicMapper.selectMusicByIndex(index, includeCover);
+    }
+
+
+    public ResultVo<Result, MusicEntity[]> getMusicInquiriesByUser(UserEntity user) {
+        if (user == null || user.isSuspended() || user.getDeletedAt() != null) {
+            return ResultVo.<Result, MusicEntity[]>builder().result(CommonResult.FAILURE_UNSIGNED).build();
+        }
+        return ResultVo.<Result, MusicEntity[]>builder()
+                .result(CommonResult.SUCCESS)
+                .payload(this.musicMapper.selectMusicByUserEmail(user.getEmail()))
+                .build();
+    }
+
 
     public MusicEntity[] searchMelon(String keyword) throws IOException, InterruptedException {
         if (keyword == null || keyword.isEmpty()) {

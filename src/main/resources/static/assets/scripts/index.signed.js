@@ -3,12 +3,21 @@ const $navItems = Array.from($nav.querySelectorAll(':scope > .menu > .item[rel]'
 // querySelectorAll 은 유사배열 객체라서 Array를 사용함
 const $main = document.getElementById('main');
 const $mainContents = Array.from($main.querySelectorAll(':scope > .content[rel]'));
+const $navActionMap = {
+    'mymusic.register': () => $mainContents.find((x) => x.getAttribute('rel') === 'mymusic.register').querySelector(':scope > form').reset(),
+    'mymusic.register_history': () => $mainContents.find((x) => x.getAttribute('rel') === 'mymusic.register_history').querySelector(':scope > .button-container > [name="refresh"]').click(),
+
+};
 
 $navItems.forEach(($navItem) => {
     $navItem.onclick = () => {
         // 여기까지 작성 했으면 alert($navItem.innerText); 로 찍어서 onclick 이 먹히는지 확인 하자
 
         const rel = $navItem.getAttribute('rel'); // mymusic.register
+        const action = $navActionMap[rel];
+        if (typeof action === 'function') {
+            action();
+        }
         const $mainContent = $mainContents.find((x) => x.getAttribute('rel') === rel);
         $navItems.forEach((x) => x.classList.remove('-selected'));
         $navItem.classList.add('-selected');
@@ -36,8 +45,7 @@ $navItems.forEach(($navItem) => {
         if ($form['melonKeyword'].value === '') {
             $melonResultInit.style.display = 'flex';
             $melonResultLoading.style.display = 'none';
-        }
-        else {
+        } else {
             $melonResultInit.style.display = 'none';
             $melonResultLoading.style.display = 'flex';
 
@@ -46,57 +54,56 @@ $navItems.forEach(($navItem) => {
             }
             melonSearchLastKeyword = $form['melonKeyword'].value;
             melonSearchTimeout = setTimeout(() => {
-            if (melonSearchLastKeyword !== $form['melonKeyword'].value) {
-                return;
-            }
-            const xhr = new XMLHttpRequest();
-            const url = new URL(location.href);
-            url.pathname = '/music/search-melon';
-            url.searchParams.set('keyword', $form['melonKeyword'].value);
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState !== XMLHttpRequest.DONE ) {
+                if (melonSearchLastKeyword !== $form['melonKeyword'].value) {
+                    return;
+                }
+                const xhr = new XMLHttpRequest();
+                const url = new URL(location.href);
+                url.pathname = '/music/search-melon';
+                url.searchParams.set('keyword', $form['melonKeyword'].value);
+                xhr.onreadystatechange = () => {
+                    if (xhr.readyState !== XMLHttpRequest.DONE) {
 
-                return;
-                }
-                $melonResultLoading.style.display = 'none';
-                if (xhr.status < 200 || xhr.status >= 300 || xhr.responseText.length === 0) {
-                    $melonResultError.style.display = 'flex';
-                return;
-                }
-                const response = JSON.parse(xhr.responseText);
-                if (response.length === 0) {
-                    $melonResultEmpty.style.display = 'flex';
-                }
-                else {
-                    const $result = $form.querySelector(':scope > .melon > .row > .result');
-                    for (const music of response) {
-                        const $item = document.createElement('span');
-                        $item.classList.add('item');
-                        const $image = document.createElement('img');
-                        $image.classList.add('image');
-                        $image.src = music['coverFileName'];
-                        const $column = document.createElement('span');
-                        $column.classList.add('column');
-                        const $name = document.createElement('span');
-                        $name.classList.add('name');
-                        $name.innerText = music['name'];
-                        const $artist = document.createElement('span');
-                        $artist.classList.add('artist');
-                        $artist.innerText = music['artist'];
-                        $column.append($name, $artist);
-                        $item.append($image, $column);
-                        $item.onmousedown = () => {
-                            $form['melonId'].value = music['youtubeId'];
-                            $form['melonCrawlButton'].click();
-                        };
-                        $result.append($item);
+                        return;
                     }
-                }
-            };
-            xhr.open('GET', url.toString());
-            xhr.send();
-            // 여기까지 왔으면 현재까지 적은 키워드 == 1초 뒤에 남아있는 키워드가 같다는것
-            // XHR 요청 보냄
+                    $melonResultLoading.style.display = 'none';
+                    if (xhr.status < 200 || xhr.status >= 300 || xhr.responseText.length === 0) {
+                        $melonResultError.style.display = 'flex';
+                        return;
+                    }
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.length === 0) {
+                        $melonResultEmpty.style.display = 'flex';
+                    } else {
+                        const $result = $form.querySelector(':scope > .melon > .row > .result');
+                        for (const music of response) {
+                            const $item = document.createElement('span');
+                            $item.classList.add('item');
+                            const $image = document.createElement('img');
+                            $image.classList.add('image');
+                            $image.src = music['coverFileName'];
+                            const $column = document.createElement('span');
+                            $column.classList.add('column');
+                            const $name = document.createElement('span');
+                            $name.classList.add('name');
+                            $name.innerText = music['name'];
+                            const $artist = document.createElement('span');
+                            $artist.classList.add('artist');
+                            $artist.innerText = music['artist'];
+                            $column.append($name, $artist);
+                            $item.append($image, $column);
+                            $item.onmousedown = () => {
+                                $form['melonId'].value = music['youtubeId'];
+                                $form['melonCrawlButton'].click();
+                            };
+                            $result.append($item);
+                        }
+                    }
+                };
+                xhr.open('GET', url.toString());
+                xhr.send();
+                // 여기까지 왔으면 현재까지 적은 키워드 == 1초 뒤에 남아있는 키워드가 같다는것
+                // XHR 요청 보냄
             }, 1000);
         }
     });
@@ -145,8 +152,7 @@ $navItems.forEach(($navItem) => {
             if (response['youtubeId'] != null) {
                 $form['youtubeId'].value = response['youtubeId'];
                 $form['youtubeIdCheckButton'].click();
-            }
-            else {
+            } else {
                 const $text = $form.querySelector(':scope > .youtube > .row > .iframe-wrapper > .text')
                 const $iframe = $form.querySelector(':scope > .youtube > .row > .iframe-wrapper > .iframe')
                 $text.style.display = 'flex'
@@ -169,11 +175,11 @@ $navItems.forEach(($navItem) => {
         const $text = $form.querySelector(':scope > .cover > .row > .preview-wrapper > .text');
         const $image = $form.querySelector(':scope > .cover > .row > .preview-wrapper > .image');
         if (($form['_cover'].files?.length ?? 0) === 0) {
-        // if ( $form['_cover].files == null || $form['_cover'].files.length === 0  와 같음
-        $text.style.display = 'flex';
-        $image.style.display = 'none';
-        $text.src = '';
-        return;
+            // if ( $form['_cover].files == null || $form['_cover'].files.length === 0  와 같음
+            $text.style.display = 'flex';
+            $image.style.display = 'none';
+            $text.src = '';
+            return;
         }
         $text.style.display = 'none';
         $image.style.display = 'block';
@@ -259,19 +265,18 @@ $navItems.forEach(($navItem) => {
             // MusicEntity::coverFileName 을 통해서 커버 이미지 URL 을 전달 받고 서버가 직접 다운로드 받아서
             // DB에 INSERT
             formData.append('coverFileName', $previewImage.getAttribute('src'));
-        }
-        else if ($previewImage.getAttribute('src').startsWith('blob:')) {
+        } else if ($previewImage.getAttribute('src').startsWith('blob:')) {
             // 이미지 직접 선택한 것
             // MultipartFile 로 전달 받아서 DB에 INSERT
             formData.append('_cover', $form['_cover'].files[0]);
-        }
-        else {
+        } else {
             // 이미지 선택 안 한 것
             Dialog.show({
                 title: '음원 등록 신청',
                 content: '커버 이미지를 선택해 주세요.',
                 buttons: [{
-                    text: '확인', onclick: ($dialog) => Dialog.hide($dialog)}]
+                    text: '확인', onclick: ($dialog) => Dialog.hide($dialog)
+                }]
             });
             return;
         }
@@ -281,7 +286,8 @@ $navItems.forEach(($navItem) => {
                 title: '음원 등록 신청',
                 content: '유튜브 식별자를 검증해 주세요',
                 buttons: [{
-                    text: '확인', onclick: ($dialog) => Dialog.hide($dialog)}]
+                    text: '확인', onclick: ($dialog) => Dialog.hide($dialog)
+                }]
             });
             return;
         }
@@ -307,12 +313,12 @@ $navItems.forEach(($navItem) => {
         formData.append('lyrics', $form['lyrics'].value);
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = () => {
-            if (xhr.readyState !== XMLHttpRequest.DONE ) {
+            if (xhr.readyState !== XMLHttpRequest.DONE) {
 
-            return;
+                return;
             }
             Loading.hide();
-            if (xhr.status < 200 || xhr.status >= 300 ) {
+            if (xhr.status < 200 || xhr.status >= 300) {
                 Dialog.show({
                     title: '오류',
                     content: '요청을 전송하는 도중 오류가 발생하였습니다. 잠시 후 다시 시도해 주세요.',
@@ -321,18 +327,21 @@ $navItems.forEach(($navItem) => {
                         onclick: ($dialog) => Dialog.hide($dialog)
                     }]
                 });
-            return;
+                return;
             }
             const response = JSON.parse(xhr.responseText);
             const [title, content, onclick] = {
                 failure: [`음원 등록 신청`, `알 수 없는 이유로 음원 등록 신청에 실패하였습니다. 잠시 후 다시 시도해 주세요 `, ($dialog) => Dialog.hide($dialog)],
                 failure_duplicate_youtube_id: [`음원 등록 신청`, `입력하신 유튜브 식별자 <b>${$form['youtubeId'].value}</b>는 이미 등록되어 있습니다.<br><br>다시 한 번 확인해 주세요. `, ($dialog) => Dialog.hide($dialog)],
                 failure_unsigned: [`음원 등록 신청`, `세션이 만료되었습니다. 로그인 후 다시 시도해 주세요.<br><br>확인 버튼을 클릭하면 로그인 페이지로 이동합니다.`,
-                    ($dialog) => {Dialog.hide($dialog)
-                location.reload();
-                }],
-                success: ['음원 등록 신청', `음원 등록 신청이 완료되었습니다. <br><br>심사 완료 후 신청한 음원이 공개 상태로 전환됩니다.<br><br>확인 버튼을 클릭하면 음원 등록 신청 내역 페이지로 이동합니다`, ($dialog) => {Dialog.hide($dialog)
-                $navItems.find((x) => x.getAttribute('rel') === 'mymusic.register_history').click();
+                    ($dialog) => {
+                        Dialog.hide($dialog)
+                        location.reload();
+                    }],
+                success: ['음원 등록 신청', `음원 등록 신청이 완료되었습니다. <br><br>심사 완료 후 신청한 음원이 공개 상태로 전환됩니다.<br><br>확인 버튼을 클릭하면 음원 등록 신청 내역 페이지로 이동합니다`, ($dialog) => {
+                    Dialog.hide($dialog)
+                    $navItems.find((x) => x.getAttribute('rel') === 'mymusic.register_history').click();
+
                 }],
             }[response['result']] || ['오류', '서버가 알 수 없는 응답을 반환하였습니다. 잠시 후 다시 시도해 주세요.', ($dialog) => Dialog.hide($dialog)];
             Dialog.show({
@@ -341,8 +350,241 @@ $navItems.forEach(($navItem) => {
                 buttons: [{text: '확인', onclick: onclick}]
             });
         };
-        xhr.open('POST','/music/');
+        xhr.open('POST', '/music/');
         xhr.send(formData);
         Loading.show(0);
+    };
+}
+
+{
+    /**
+     * @param {Array<number>} indexArray
+     */
+    const withdraw = (indexArray) => {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        // put 은 기존에 있던 요소를 치환하고 add 는 그냥 섞여버림
+        for (const index of indexArray) {
+            formData.append('indexes', index.toString()); // [ 3, 2, 1 ]
+        }
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState !== XMLHttpRequest.DONE) {
+                return;
+            }
+            Loading.hide();
+            if (xhr.status < 200 || xhr.status >= 300) {
+                Dialog.show({
+                    title: '오류',
+                    content: '요청을 전송하는 도중 오류가 발생하였습니다. 잠시 후 다시 시도해 주세요.',
+                    buttons: [{
+                        text: '확인',
+                        onclick: ($dialog) => Dialog.hide($dialog)
+                    }]
+                });
+                return;
+            }
+            const response = JSON.parse(xhr.responseText);
+            const[title, content, onclick] = {
+                failure: ['음원 등록 취소', '알 수 없는 이유로 음원 등록 신청 취소에 실패하였습니다. 잠시 후 다시 시도해 주세요.' ],
+                failure_unsigned: ['음원 등록 신청 취소', `세션이 만료되었습니다. 로그인 후 다시 시도해 주세요.<br><br>확인 버튼을 클릭하면 로그인 페이지로 이동합니다`, ($dialog) => { Dialog.hide($dialog);
+                            location.reload();
+                }],
+                success: ['음원 등록 신청 취소', `음원 등록 신청이 성공적으로 취소되었습니다.`, ($dialog) => {
+                    Dialog.hide($dialog);
+                    $mainContents.find((x) => x.getAttribute('rel') === 'mymusic.register_history').querySelector(':scope > .button-container > [name="refresh"]').click();
+                }]
+            }[response['result']] || ['오류', '서버가 알 수 없는 응답을 반환하였습니다. 잠시 후 다시 시도해 주세요.', ($dialog) => Dialog.hide($dialog)];
+            Dialog.show({
+                title: title,
+                content: content,
+                buttons: [{text: '확인', onclick: onclick}]
+            });
+        };
+        xhr.open('DELETE', '/music/');
+        xhr.send(formData);
+        Loading.show(0)
+
+
+    }
+
+    const $content = $mainContents.find((x) => x.getAttribute('rel') === 'mymusic.register_history');
+    const $selectAllButton = $content.querySelector(':scope > .button-container > [name="selectAll"]');
+    const $unselectButton = $content.querySelector(':scope > .button-container > [name="unselectAll"]');
+    const $withdrawButton = $content.querySelector(':scope > .button-container > [name="withdraw"]');
+    const $refreshButton = $content.querySelector(':scope > .button-container > [name="refresh"]');
+    const $table = $content.querySelector(':scope > table');
+    const $tbody = $table.querySelector(':scope > tbody');
+
+    $selectAllButton.onclick = () => $tbody.querySelectorAll(':scope > tr > td > label > input[name="check"]').forEach((x) => x.checked = true);
+
+    $unselectButton.onclick = () => $tbody.querySelectorAll(':scope > tr > td > label > input[name="check"]').forEach((x) => x.checked = false);
+
+    $withdrawButton.onclick = () => {
+        const $trs = $tbody.querySelectorAll(':scope > tr');
+        const indexArray = [];
+        let invalidTrIncluded = false;
+        for (const $tr of $trs) {
+            if ($tr.querySelector(':scope > td > label > input[name="check"]').checked) {
+                indexArray.push($tr.dataset['index']);
+                if ($tr.dataset['status'] !== 'PENDING') {
+                    invalidTrIncluded = true;
+                    break;
+                }
+            }
+        }
+        if (invalidTrIncluded === true) {
+            Dialog.show({
+                title: '선택 신청 취소',
+                content: `상태가 <i>승인 대기 중</i>이 아닌 항목을 신청 취소할 수 없습니다.`,
+                buttons: [{text: '확인', onclick: ($dialog) => Dialog.hide($dialog)}]
+            });
+            return;
+        }
+
+        if (indexArray.length === 0) {
+            Dialog.show({
+                title: '선택 신청 취소',
+                content: '음원 등록 신청을 취소할 항목을 한 개 이상 체크해 주세요.',
+                buttons: [{
+                    text: '확인',
+                    onclick: ($dialog) => Dialog.hide($dialog)
+                }]
+            });
+            return;
+        }
+        Dialog.show({
+            title: '선택 신청 취소',
+            content: `정말로 선택한 <b>${indexArray.length.toLocaleString()}</b>개의 음원 등록 신청을 취소할까요?<br><br>취소한 내역은 복구할 수 없습니다.`,
+            buttons: [
+                {text: '취소', onclick: ($dialog) => Dialog.hide($dialog)},
+                {
+                    text: '계속',
+                    onclick: ($dialog) => {
+                        Dialog.hide($dialog);
+                        withdraw(indexArray);
+                    }
+                }
+            ]
+        });
+    };
+
+    $refreshButton.onclick = () => {
+
+        const xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState !== XMLHttpRequest.DONE) {
+
+                return;
+            }
+            Loading.hide();
+            if (xhr.status < 200 || xhr.status >= 300) {
+
+                Dialog.show({
+                    title: '오류',
+                    content: '요청을 전송하는 도중 오류가 발생하였습니다. 잠시 후 다시 시도해 주세요.',
+                    buttons: [{
+                        text: '확인',
+                        onclick: ($dialog) => Dialog.hide($dialog)
+                    }]
+                });
+                return;
+            }
+            const response = JSON.parse(xhr.responseText);
+            if (response.result === 'failure') {
+                Dialog.show({
+                    title: '음원 등록 신청 내역',
+                    content: '알 수 없는 이유로 음원 등록 신청 내역을 조회하지 못하였습니다. 잠시 후 다시 시도해 주세요',
+                    buttons: [{
+                        text: '확인', onclick: ($dialog) =>
+                            Dialog.hide($dialog)
+                    }]
+                });
+            } else if (response['result'] === 'failure_unsigned') {
+                Dialog.show({
+                    title: '음원 등록 신청 내역',
+                    content: `세션이 만료되었습니다. 로그인 후 다시 시도해 주세요.<br><br>확인 버튼을 클릭하면 로그인 페이지로 이동합니다.`,
+                    buttons: [{
+                        text: '확인', onclick: ($dialog) => {
+                            Dialog.hide($dialog);
+                            location.reload();
+                        }
+                    }]
+                });
+            } else if (response['result'] === 'success') {
+                $tbody.innerHTML = '';
+                for (const music of response['musics']) {
+                    const $tr = new DOMParser().parseFromString(`
+                        <table>
+                            <tbody>
+                            <tr data-index="${music['index']}" data-status="${music["status"]}">
+                    <td>
+                        <label class="--obj-check-label">
+                            <input name="check" type="checkbox" class="_input">
+                            <span class="_box"></span>
+                        </label>
+                    </td>
+                    <td class="-text-align-center">${music['index']}</td>
+                    <td class="-no-padding">
+                        <img class="cover" alt="커버" src="/music/cover?index=${music['index']}">
+                    </td>
+                    <td>${music['artist']}</td>
+                    <td>${music['album']}</td>
+                    <td class="-text-align-center">${music['releaseDate'].map((x, i) => i === 0 ? x : x.toString().padStart(2, '0')).join('-')}</td>
+                    <td>${music['genre']}</td>
+                    <td>${music['name']}</td>
+                    <td>${music['youtubeId']}</td>
+                    <td>${{ALLOWED: "승인", DENIED: '반려', PENDING: '승인 대기중'}[music['status']]}</td>
+                    <td>
+                        <button class="--obj-button -color-red -size-small" name="withdraw" type="button">신청 취소</button>
+                    </td>
+                </tr>
+                           </tbody>
+                    </table>
+                        `, 'text/html').querySelector('tr');
+                    const $withdrawButton = $tr.querySelector(':scope > td > button[name="withdraw"]');
+                    $withdrawButton.onclick = () => {
+                        if (music['status'] !== 'PENDING') {
+                            Dialog.show({
+                                title: '선택 신청 취소',
+                                content: '상태가 <i>승인 대기 중</i>이 아닌 항목을 신청 취소할 수 없습니다.',
+                                buttons: [{
+                                    text: '확인', onclick: ($dialog) =>
+                                        Dialog.hide($dialog)}]
+                            });
+                            return;
+                        }
+                        Dialog.show({
+                            title: '선택 신청 취소',
+                            content: `정말로 해당 음원 등록 신청을 취소할까요?<br><br>취소한 내역은 복구할 수 없습니다.`,
+                            buttons: [
+                                {text: '취소', onclick: ($dialog) => Dialog.hide($dialog)},
+                                {
+                                    text: '계속',
+                                    onclick: ($dialog) => {
+                                        Dialog.hide($dialog);
+                                        withdraw([music['index']]);
+                                    }
+                                }
+                            ]
+                        });
+                    };
+                    $tbody.append($tr);
+                }
+            } else {
+                Dialog.show({
+                    title: '오류',
+                    content: '서버가 알 수 없는 응답을 반환하였습니다. 잠시 후 다시 시도해 주세요.',
+                    buttons: [{
+                        text: '확인', onclick: ($dialog) =>
+                            Dialog.hide($dialog)
+                    }]
+                });
+            }
+        };
+        xhr.open('GET', '/music/inquiries');
+        xhr.send();
+        Loading.show(0);
+
+
     };
 }

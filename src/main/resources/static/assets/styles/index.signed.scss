@@ -8,6 +8,7 @@ body {
 }
 
 #nav {
+  @include flex(column, flex-start, flex-start, 1rem);
   width: 10rem;
   background-color: #222324;
   padding: 1rem;
@@ -15,7 +16,7 @@ body {
 
   > .logo {
     height: 2rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     -webkit-user-drag: none;
 
   }
@@ -61,21 +62,20 @@ body {
 #main {
   background-color: #222324;
   flex-grow: 1;
-  overflow: hidden auto;
-
+  overflow: auto;
   position: relative;
 
 
-  scrollbar-color: #424242 #222424;  /*스크롤바 색상 : 잡는거색 전체색 */
+  scrollbar-color: #424242 #222424; /*스크롤바 색상 : 잡는거색 전체색 */
   scrollbar-width: thin; /* 스크롤바 굵기 : auto/ thin / none 박에 없은 px, rem 못줌 */
 
-  &::-webkit-scrollbar {
-    width: 1rem;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: red;
-  }
+  //&::-webkit-scrollbar {
+  //  width: 1rem;
+  //}
+  //
+  //&::-webkit-scrollbar-track {
+  //  background-color: red;
+  //}
 
   > .header {
     height: 2rem;
@@ -86,7 +86,7 @@ body {
   > .content {
     top: 3.5rem;
     left: 0;
-    width: 100%;
+    max-width: 0;
     max-height: 0;
     height: calc(100% - 3.5rem);
     box-sizing: border-box;
@@ -102,6 +102,7 @@ body {
 
     &.-visible {
       max-height: initial;
+      max-width: initial;
       overflow: initial;
       opacity: 1;
       pointer-events: all;
@@ -135,6 +136,8 @@ body {
 }
 
 #main > .content[rel="mymusic.register"] {
+
+
   > form {
     > .melon {
       position: relative;
@@ -164,7 +167,7 @@ body {
         > .result {
           @include flex(column, stretch, flex-start);
           top: 100%;
-          left:0;
+          left: 0;
           width: 100%;
           backdrop-filter: blur(1rem);
           background-color: #222324c0;
@@ -190,7 +193,7 @@ body {
                 from {
                   transform: rotateZ(0deg);
                 }
-                to{
+                to {
                   transform: rotateZ(360deg);
                 }
               }
@@ -209,6 +212,7 @@ body {
 
 
           }
+
           > .item {
             @include flex(row, center, flex-start, 0.5rem);
             background-color: #ffffff00;
@@ -292,10 +296,9 @@ body {
       }
     }
 
-    > .youtube{
+    > .youtube {
       > .row {
         @include flex(row, stretch, flex-start, 1rem);
-
 
 
         > .input-wrapper {
@@ -308,7 +311,7 @@ body {
             letter-spacing: 0.25rem;
             text-align: center;
 
-        }
+          }
         }
 
         > .iframe-wrapper {
@@ -341,12 +344,47 @@ body {
       }
     }
 
+
     > .--obj-label > [name="lylics"] {
       min-height: 10rem;
       resize: vertical;
     }
   }
 }
+
+#main > .content[rel="mymusic.register_history"] {
+     > .button-container {
+       @include flex(row, stretch, flex-start, 0.375rem);
+       margin-bottom: 0.5rem;
+     }
+
+     > table > tbody > tr > td {
+       > .cover {
+         width: 2.25rem;
+         height: 2.25rem;
+         object-fit: cover;
+         object-position: center;
+       }
+     }
+   }
+
+#main > .content[rel="admin.music"] {
+  > .button-container {
+    @include flex(row, stretch, flex-start, 0.375rem);
+    margin-bottom: 0.5rem;
+  }
+
+  > table > tbody > tr > td {
+    > .cover {
+      width: 2.25rem;
+      height: 2.25rem;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+}
+
+
 
 #player {
   @include flex(column, stretch, flex-start, 1rem);
