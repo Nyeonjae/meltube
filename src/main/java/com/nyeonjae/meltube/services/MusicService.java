@@ -158,10 +158,6 @@ public class MusicService {
     }
 
 
-    public MusicEntity[] getAllMusic(boolean includeCover) {
-        return this.musicMapper.selectMusics(includeCover);
-    }
-
     @Transactional
     public Result withdrawInquiries(UserEntity user, int[] indexes) {
         if (user == null || user.isSuspended() || user.getDeletedAt() != null) {
